@@ -28,18 +28,6 @@ bool cb_is_full(const CircBuff *cb){
     return cb->count == BUFFER_SIZE;
 }
 
-void cb_push(CircBuff *cb, uint8_t data){
-    if(!cb_is_full(cb)){
-        cb->buffer[cb->head] = data;
-        cb->head = (cb->head + 1) % BUFFER_SIZE;
-        cb->count++;
-        return;
-    }
-    cb->buffer[cb->head] = data;
-    cb->head = (cb->head + 1) % BUFFER_SIZE;
-    cb->tail = (cb->tail + 1) % BUFFER_SIZE;
-}
-
 bool cb_pop(CircBuff *cb){
     if(cb_is_empty(cb)){
         return false;
@@ -60,6 +48,20 @@ void print_row(const CircBuff *cb){
     printf("\033[K");
     fflush(stdout);
     sleep(1);
+}
+
+void cb_push(CircBuff *cb, uint8_t data){
+    if(!cb_is_full(cb)){
+        cb->buffer[cb->head] = data;
+        cb->head = (cb->head + 1) % BUFFER_SIZE;
+        cb->count++;
+        return;
+    }
+    cb->buffer[cb->tail] = 0;
+    print_row(cb);
+    cb->buffer[cb->head] = data;
+    cb->head = (cb->head + 1) % BUFFER_SIZE;
+    cb->tail = (cb->tail + 1) % BUFFER_SIZE;
 }
 
 int main(void){
